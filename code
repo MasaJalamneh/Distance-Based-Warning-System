@@ -1,0 +1,54 @@
+const int trigPin = 11;
+const int echoPin = 10;
+const int greenLED = 2;
+const int yellowLED = 3;
+const int redLED = 4;
+const int potPin = A4; // Potentiometer connected to analog pin A0
+
+void setup() {
+    pinMode(trigPin, OUTPUT);
+    pinMode(echoPin, INPUT);
+    pinMode(greenLED, OUTPUT);
+    pinMode(yellowLED, OUTPUT);
+    pinMode(redLED, OUTPUT);
+    pinMode(potPin, INPUT);
+}
+
+void loop() {
+    long duration, distance;
+    int potValue = analogRead(potPin); // Read potentiometer value (0-1023)
+
+    // Map potentiometer value to a maximum distance threshold (e.g., 10-50 cm)
+    int maxDistance = map(potValue, 0, 1023, 10, 150);
+
+    // Define threshold distances based on maxDistance
+    int yellowThreshold = maxDistance / 2; // Mid-range threshold
+    int redThreshold = yellowThreshold / 2; // Close-range threshold
+
+    // Trigger the ultrasonic pulse
+    digitalWrite(trigPin, LOW);
+    delayMicroseconds(2);
+    digitalWrite(trigPin, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(trigPin, LOW);
+
+    // Measure the duration and calculate distance
+    duration = pulseIn(echoPin, HIGH);
+    distance = duration * 0.034 / 2;
+
+    // Determine which LED to light up
+    if (distance > yellowThreshold) {
+        digitalWrite(greenLED, HIGH);
+        digitalWrite(yellowLED, LOW);
+        digitalWrite(redLED, LOW);
+    } else if (distance > redThreshold && distance <= yellowThreshold) {
+        digitalWrite(greenLED, LOW);
+        digitalWrite(yellowLED, HIGH);
+        digitalWrite(redLED, LOW);
+    } else if (distance <= redThreshold) {
+        digitalWrite(greenLED, LOW);
+        digitalWrite(yellowLED, LOW);
+        digitalWrite(redLED, HIGH);
+    } 
+
+}
